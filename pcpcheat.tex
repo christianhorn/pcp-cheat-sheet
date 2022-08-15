@@ -7,6 +7,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% TODO: -- come out as long line
 
 \documentclass[12pt]{article}
 \usepackage[a3paper,landscape]{geometry}
@@ -67,8 +68,8 @@
 	    \hspace*{0.5cm}\# systemctl status pmcd pmlogger \\
 	
 	\textbf{Important tools}\\
-	Package 'pcp-system-tools' contains following tools, which work towards live
-	running pmcd, and towards archive files:
+	Tools from package 'pcp-system-tools' can be used with either 
+	the running pmcd, or PCP archive files:
 	\begin{itemize}
 	    \item pcp atop
 	    \item pcp collectcl
@@ -147,10 +148,14 @@
 \posterbox[adjusted title=pmdas]
 	{name=pmdas,column=2,below=title}{
 		\textbf{PMDA installation} \\
-		Most PMDS's can be searched and installed following this pattern: \\ 
+		PMDA's are code pieces capable of reading metrics from their area
+		like sensors, database, and so on.
+		PMDS's can be searched as packages and installed, for example on yum4/dnf
+		distros: \\ 
     	\hspace*{0.5cm}\# dnf search pcp-pmda \\
     	\hspace*{0.5cm}\# dnf install -y pcp-pmda-lmsensors \\
     	\hspace*{0.5cm}\# cd /var/lib/pcp/pmdas/lmsensors \\
+    	\hspace*{0.5cm}\# less README \\
     	\hspace*{0.5cm}\# ./Install
 }
 
@@ -168,21 +173,26 @@
 }
 
 %------------------------------------------------
-% diff
+% pmdiff
 %------------------------------------------------
 
-\posterbox[adjusted title=diff]
+\posterbox[adjusted title=Anomaly search in archives]
 	{name=diff,column=2,between=pmdas and links}{
-		\textbf{Automated Analysis} \\
-		Analyze which metrics are remarkably different in a certain timeframe: \\
+		Which metrics are remarkably different in a certain timeframe?
+		Example: we had I/O problems from 2am to 3am: \\
     	\hspace*{0.5cm}\# cat cull \\
     	\hspace*{1.2cm}     rsyslog. \\
-    	\hspace*{0.5cm}\# pmdiff -z -X ./cull -q 10 --start @10:00 --finish @10:30 \\
-    	\hspace*{1.2cm}   --begin @12:00 --end @12:30 ./archives/20120512 | less \\
+    	\hspace*{0.5cm}\# pmdiff -z -X ./cull -q 10 \textbackslash \\
+    	\hspace*{1.2cm}     --start @10:00 --finish @10:30 \textbackslash \\
+    	\hspace*{1.2cm}		--begin @12:00 --end @12:30 \textbackslash \\
+    	\hspace*{1.2cm}		./archives/20120512 $\vert$ less \\
+
 		What are the top 5 cpu and memory hogs? \\
-    	\hspace*{0.5cm}\# pmrep proc.hog.cpu, proc.memory.rss -J 5 -1 -g -b MB \\
+    	\hspace*{0.5cm}\# pmrep proc.hog.cpu, proc.memory.rss \textbackslash \\
+    	\hspace*{1.2cm}		-J 5 -1 -g -b MB \\
+
 		What are the current PIDs, and how much rss uses process with pid 75? \\
-    	\hspace*{0.5cm}\# pmrep proc.smaps.rss -g|less \\
+    	\hspace*{0.5cm}\# pmrep proc.smaps.rss -g $\vert$ less \\
     	\hspace*{0.5cm}\# pmrep proc.smaps.rss -g -i '.*75.*'
 }
 
