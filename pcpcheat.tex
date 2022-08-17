@@ -98,7 +98,7 @@
 % Links
 %------------------------------------------------
 
-\posterbox[adjusted title=Links]{name=links,column=2,span=1.5,above=bottom}{
+\posterbox[adjusted title=Links]{name=links,column=2,span=2,above=bottom}{
 	\begin{enumerate}[{[1]}]
 		% \item\label{litA} Important Authors, \textit{Important Title}
     	\item \href{https://access.redhat.com/articles/1145953}{kbase: Index of  (PCP) articles, solutions, tutorials, white papers}
@@ -138,7 +138,8 @@
 		\\
 		\textbf{Graphical access} \\
     	\hspace*{0.5cm}\# pmchart \\
-    	\hspace*{0.5cm}\# dnf -y install pcp2pdf; pcp2pdf -a \textless arch\textgreater \\
+    	\hspace*{0.5cm}\# dnf -y install pcp2pdf; \textbackslash \\
+    	\hspace*{1.0cm}   pcp2pdf -a \textless archivename\textgreater \\
 }
 
 %------------------------------------------------
@@ -205,32 +206,38 @@
 		\textbf{Install PCP on clients} \\
 		Setup client systems to offer metrics via pmcd: install pcp, open packet 
 		based firewall, enable remote access in pmcd: \\
-    \hspace*{0.5cm} yum -y install pcp \\
-    \hspace*{0.5cm} firewall-cmd --permanent --zone=public --add-port=44321/tcp \\
-    \hspace*{0.5cm} firewall-cmd --reload \\
-    \hspace*{0.5cm} if grep -q PMCD\_LOCAL /etc/sysconfig/pmcd; then \\
-    \hspace*{1.1cm} sed -ie 's,PMCD\_LOCAL.*,PMCD\_LOCAL=0,' /etc/sysconfig/pmcd \\
-    \hspace*{0.5cm} else \\
-    \hspace*{1.1cm} echo 'PMCD\_LOCAL=0' >>/etc/sysconfig/pmcd \\
-    \hspace*{0.5cm} fi \\
-    \hspace*{0.5cm} grep PMCD\_LOCAL /etc/sysconfig/pmcd \\
-    \hspace*{0.5cm} service pmcd restart \\
-    \hspace*{0.5cm} chkconfig pmcd on \\
-\\
+	\footnotesize{
+	    \hspace*{0.5cm}\# yum -y install pcp \\
+	    \hspace*{0.5cm}\# firewall-cmd --permanent --zone=public \textbackslash \\
+	    \hspace*{1.1cm}   --add-port=44321/tcp \\
+	    \hspace*{0.5cm}\# firewall-cmd --reload \\
+	    \hspace*{0.5cm}\# CONFIG=/etc/sysconfig/pmcd \\
+	    \hspace*{0.5cm}\# if grep -q PMCD\_LOCAL \$CONFIG; then \textbackslash \\
+	    \hspace*{1.1cm}   sed -ie 's,PMCD\_LOCAL.*,PMCD\_LOCAL=0,' \textbackslash \\
+	    \hspace*{1.1cm}   /etc/sysconfig/pmcd \textbackslash \\
+	    \hspace*{0.9cm}   else \\
+	    \hspace*{1.1cm}   echo 'PMCD\_LOCAL=0' >>/etc/sysconfig/pmcd \\
+	    \hspace*{0.9cm}   fi \\
+	    \hspace*{0.5cm}\# grep PMCD\_LOCAL /etc/sysconfig/pmcd \\
+	    \hspace*{0.5cm}\# service pmcd restart \\
+	    \hspace*{0.5cm}\# chkconfig pmcd on \\
+	}
 
 		\textbf{Install PCP on collector system} \\
-On the collector, we install pcp-zeroconf which also sets up logging to archive files.
-We then set variable CLIENT to the clients name, create a config- and controlfile,
-and notify pmlogger of the changes.
-    \hspace*{0.5cm} yum -y install pcp-zeroconf \\
-    \hspace*{0.5cm} CLIENT=rhel7u8a \\
-    \hspace*{0.5cm} /usr/libexec/pcp/bin/pmlogconf \textbackslash \\
-    \hspace*{1.5cm} /var/lib/pcp/config/pmlogger/config.\$CLIENT \\
-    \hspace*{0.5cm} \# optionally, execute the last command a second time \\
-    \hspace*{0.5cm} echo "\$CLIENT.local n n PCP\_LOG\_DIR/pmlogger/\$CLIENT.local" \textbackslash \\
-    \hspace*{1.5cm} " -r -T30d -c config.\$CLIENT" \textbackslash \\
-    \hspace*{1.5cm} >/etc/pcp/pmlogger/control.d/\$CLIENT \\
-    \hspace*{0.5cm} /usr/libexec/pcp/bin/pmlogger\_check
+	On the collector, we install pcp-zeroconf which also sets up logging to archive files.
+	We then set variable CLIENT to the clients name, create a config- and controlfile,
+	and notify pmlogger of the changes.
+	\footnotesize{
+	    \hspace*{0.5cm}\# yum -y install pcp-zeroconf \\
+	    \hspace*{0.5cm}\# CLIENT=rhel7u8a \\
+	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogconf \textbackslash \\
+	    \hspace*{1.1cm}   /var/lib/pcp/config/pmlogger/config.\$CLIENT \\
+	    \hspace*{0.5cm}\# echo "\$CLIENT.local n n " \textbackslash \\
+	    \hspace*{1.1cm}   PCP\_LOG\_DIR/pmlogger/\$CLIENT.local" \textbackslash \\
+	    \hspace*{1.1cm}   " -r -T30d -c config.\$CLIENT" \textbackslash \\
+	    \hspace*{1.1cm}   \textgreater/etc/pcp/pmlogger/control.d/\$CLIENT \\
+	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogger\_check
+	}
 
 % \includegraphics[width=10em,height=4em]{pics/s05_pcp-daemons-grafanaserver.png}
 \center{
