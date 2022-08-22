@@ -7,8 +7,6 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: -- come out as long line
-
 \documentclass[12pt]{article}
 \usepackage[a3paper,landscape]{geometry}
 \usepackage{lipsum}
@@ -47,10 +45,10 @@
 }
 
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % Basics
-%------------------------------------------------
-	
+%----------------------------------------------------------------------------------
+
 \posterbox[adjusted title=PCP basics]{name=basics,
 	below=title}{
 	% sequence=1 between title and bottom}{
@@ -94,9 +92,9 @@
 	}
 
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % Links
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=Links]{name=links,column=2,span=2,above=bottom}{
 	\begin{enumerate}[{[1]}]
@@ -108,9 +106,9 @@
 	\end{enumerate}
 }
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % Archive files
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=Archive files]
 	{name=archivefiles,column=3,between=title and links}{
@@ -131,10 +129,10 @@
 		Most basic access to metrics: \\
     	\hspace*{0.5cm}\# pmstat -t 1 \\
 		\hspace*{0.5cm}\# pmrep -a \textless archivename\textgreater   \textless metric\textgreater \\
-    	\hspace*{0.5cm}\# pcp -a 20180831.11.31 --origin @1pm \textbackslash \\
-    	\hspace*{1.0cm}   dstat --time --disk --mem 60sec 10 \\
+    	\hspace*{0.5cm}\# pcp -a 20180831.11.31 -\/-origin @1pm \textbackslash \\
+    	\hspace*{1.0cm}   dstat -\/-time -\/-disk -\/-mem 60sec 10 \\
     	\hspace*{0.5cm}\# pmrep -a 20220128 kernel.cpu -p -t 300 \textbackslash \\
-    	\hspace*{1.0cm}   --hostzone -S @19:30 \\
+    	\hspace*{1.0cm}   -\/-hostzone -S @19:30 \\
 		\\
 		\textbf{Graphical access} \\
     	\hspace*{0.5cm}\# pmchart \\
@@ -142,9 +140,9 @@
     	\hspace*{1.0cm}   pcp2pdf -a \textless archivename\textgreater \\
 }
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % pmdas
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=pmdas]
 	{name=pmdas,column=2,below=title}{
@@ -160,22 +158,22 @@
     	\hspace*{0.5cm}\# ./Install
 }
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % pmie
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=pmie]
 	{name=pmie,column=1,below=basics}{
 		pmie, performance metrics interference engine, can react on defined
 		metric states: send email on high load, and so on. \\ 
-    	\hspace*{0.5cm}\# pmie --verbose --timestamp --interval 1 \\
+    	\hspace*{0.5cm}\# pmie -\/-verbose -\/-timestamp -\/-interval 1 \\
     	\hspace*{0.5cm}\# /etc/pcp/pmie/config.default \\
-    	\hspace*{0.5cm}\# pmie --archive 20200512 --config \textless rules\textgreater
+    	\hspace*{0.5cm}\# pmie -\/-archive 20200512 -\/-config \textless rules\textgreater
 }
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % pmdiff
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=Anomaly search in archives]
 	{name=diff,column=2,between=pmdas and links}{
@@ -184,8 +182,8 @@
     	\hspace*{0.5cm}\# cat cull \\
     	\hspace*{1.2cm}     rsyslog. \\
     	\hspace*{0.5cm}\# pmdiff -z -X ./cull -q 10 \textbackslash \\
-    	\hspace*{1.2cm}     --start @10:00 --finish @10:30 \textbackslash \\
-    	\hspace*{1.2cm}		--begin @12:00 --end @12:30 \textbackslash \\
+    	\hspace*{1.2cm}     -\/-start @10:00 -\/-finish @10:30 \textbackslash \\
+    	\hspace*{1.2cm}		-\/-begin @12:00 -\/-end @12:30 \textbackslash \\
     	\hspace*{1.2cm}		./archives/20120512 $\vert$ less \\
 
 		What are the top 5 cpu and memory hogs? \\
@@ -197,9 +195,9 @@
     	\hspace*{0.5cm}\# pmrep proc.smaps.rss -g -i '.*75.*'
 }
 
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 % Remote collection
-%------------------------------------------------
+%----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=Remote collection]
 	{name=remotecollection,column=4,below=top}{
@@ -208,9 +206,9 @@
 		based firewall, enable remote access in pmcd: \\
 	\footnotesize{
 	    \hspace*{0.5cm}\# yum -y install pcp \\
-	    \hspace*{0.5cm}\# firewall-cmd --permanent --zone=public \textbackslash \\
-	    \hspace*{1.1cm}   --add-port=44321/tcp \\
-	    \hspace*{0.5cm}\# firewall-cmd --reload \\
+	    \hspace*{0.5cm}\# firewall-cmd -\/-permanent -\/-zone=public \textbackslash \\
+	    \hspace*{1.1cm}   -\/-add-port=44321/tcp \\
+	    \hspace*{0.5cm}\# firewall-cmd -\/-reload \\
 	    \hspace*{0.5cm}\# CONFIG=/etc/sysconfig/pmcd \\
 	    \hspace*{0.5cm}\# if grep -q PMCD\_LOCAL \$CONFIG; then \textbackslash \\
 	    \hspace*{1.1cm}   sed -ie 's,PMCD\_LOCAL.*,PMCD\_LOCAL=0,' \textbackslash \\
@@ -241,7 +239,7 @@
 
 % \includegraphics[width=10em,height=4em]{pics/s05_pcp-daemons-grafanaserver.png}
 \center{
-    \includegraphics[width=20em]{pics/s05_browsers_pcp_servers_overview_components.jpg}
+    \includegraphics[width=20em]{pics/s05_browsers_pcp_servers_overview_componentsb.png}
 }
 
 % pmlogconf - configures configfile, including the pmdas you run on the system
