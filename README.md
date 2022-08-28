@@ -24,3 +24,9 @@ git clone https://github.com/christianhorn/pcp-cheat-sheet
 cd pcp-cheat-sheet
 make
 ```
+
+## Known bugs
+
+- I have content to start a second page, but maybe cheat sheets should 
+  concentrate on what fits to one page.  Also, tcolorbox[poster] only
+  supports a single page.
