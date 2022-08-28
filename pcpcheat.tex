@@ -41,7 +41,8 @@
 		halign=center,valign=center,fontupper=\bfseries\large,colupper=red!25!black
 	]{name=title,column=1,span=3,below=top}{
 	\resizebox{18cm}{!}{\bfseries\Huge Performance Co-Pilot cheat sheet}\\[3mm]
-	Christian Horn \textless chorn@fluxcoil.net\textgreater
+    \href{https://github.com/christianhorn/pcp-cheat-sheet}{https://github.com/christianhorn/pcp-cheat-sheet}
+	% Christian Horn \textless chorn@fluxcoil.net\textgreater
 }
 
 
@@ -49,8 +50,7 @@
 % Basics
 %----------------------------------------------------------------------------------
 
-\posterbox[adjusted title=PCP basics]{name=basics,
-	below=title}{
+\posterbox[adjusted title=PCP basics]{name=basics,below=title}{
 	% sequence=1 between title and bottom}{
 
 	\textbf{Installation}\\
@@ -107,11 +107,76 @@
 }
 
 %----------------------------------------------------------------------------------
+% Remote collection
+%----------------------------------------------------------------------------------
+
+\posterbox[adjusted title=Remote collection]
+	{name=remotecollection,column=3,below=title}{
+		\textbf{Install PCP on clients} \\
+		Setup client systems to offer metrics via pmcd: install pcp, open packet 
+		based firewall, enable remote access in pmcd: \\
+	\footnotesize{
+	    \hspace*{0.5cm}\# yum -y install pcp \\
+	    \hspace*{0.5cm}\# firewall-cmd -\/-permanent -\/-zone=public \textbackslash \\
+	    \hspace*{1.1cm}   -\/-add-port=44321/tcp \\
+	    \hspace*{0.5cm}\# firewall-cmd -\/-reload \\
+	    \hspace*{0.5cm}\# CONFIG=/etc/sysconfig/pmcd \\
+	    \hspace*{0.5cm}\# if grep -q PMCD\_LOCAL \$CONFIG; then \textbackslash \\
+	    \hspace*{1.1cm}   sed -ie 's,PMCD\_LOCAL.*,PMCD\_LOCAL=0,' \textbackslash \\
+	    \hspace*{1.1cm}   /etc/sysconfig/pmcd \textbackslash \\
+	    \hspace*{0.9cm}   else \\
+	    \hspace*{1.1cm}   echo 'PMCD\_LOCAL=0' >>/etc/sysconfig/pmcd \\
+	    \hspace*{0.9cm}   fi \\
+	    \hspace*{0.5cm}\# grep PMCD\_LOCAL /etc/sysconfig/pmcd \\
+	    \hspace*{0.5cm}\# service pmcd restart \\
+	    \hspace*{0.5cm}\# chkconfig pmcd on \\
+	}
+
+		\textbf{Install PCP on collector system} \\
+	On the collector, we install pcp-zeroconf which also sets up logging to archive files.
+	We then set variable CLIENT to the clients name, create a config- and controlfile,
+	and notify pmlogger of the changes.
+	\footnotesize{
+	    \hspace*{0.5cm}\# yum -y install pcp-zeroconf \\
+	    \hspace*{0.5cm}\# CLIENT=rhel7u8a \\
+	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogconf \textbackslash \\
+	    \hspace*{1.1cm}   /var/lib/pcp/config/pmlogger/config.\$CLIENT \\
+	    \hspace*{0.5cm}\# echo "\$CLIENT.local n n " \textbackslash \\
+	    \hspace*{1.1cm}   PCP\_LOG\_DIR/pmlogger/\$CLIENT.local" \textbackslash \\
+	    \hspace*{1.1cm}   " -r -T30d -c config.\$CLIENT" \textbackslash \\
+	    \hspace*{1.1cm}   \textgreater/etc/pcp/pmlogger/control.d/\$CLIENT \\
+	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogger\_check
+	}
+
+% \center{
+%     \includegraphics[width=20em]{pics/s05_browsers_pcp_servers_overview_componentsb.png}
+% }
+
+% pmlogconf - configures configfile, including the pmdas you run on the system
+
+}
+
+%----------------------------------------------------------------------------------
+% Live metrics
+%----------------------------------------------------------------------------------
+
+\posterbox[adjusted title=Live metrics]
+	{name=livemetrics,column=3,between=remotecollection and links}{
+		Accessing kernel.all.load metric of local system: \\
+    	\hspace*{0.5cm}\# pmrep -p kernel.all.load \\
+		Get live metrics from 2 remote systems: \\
+    	\hspace*{0.5cm}\# pmstat -h local: -h remotesystem1
+}
+
+%----------------------------------------------------------------------------------
 % Archive files
 %----------------------------------------------------------------------------------
 
 \posterbox[adjusted title=Archive files]
-	{name=archivefiles,column=3,between=title and links}{
+	{name=archivefiles,column=4,below=top}{
+	% {name=archivefiles,sequence=3 between title and links then
+	% 							4 between top and bottom}{
+
 		\textbf{Basics}	\\
 		Which archive is pmlogger logging into? \\
     	\hspace*{0.5cm}\# pcp \\
@@ -125,15 +190,29 @@
 		Have pmdiff point out 'significant peaks' in archives: \\
     	\hspace*{0.5cm}\# pmdiff -a \textless archivename\textgreater \\
 
+		Merge all archive files ending in .0 into a single archive: \\
+    	\hspace*{0.5cm}\# pmlogextract *.0 single-archive-name \\
+
 		\textbf{Accessing metrics} \\
+		Which time span is covered by the archive file, time displayed
+		for the timezone you are running while analyzing? \\
+    	\hspace*{0.5cm}\# pmdumplog -L \textless archive\textgreater \\
+		Which time span is covered by the archive file, time displayed \\
+		with the timezone of the system which recorded the archive file? \\
+    	\hspace*{0.5cm}\# pmdumplog -L \textless archive\textgreater -z \\
 		Most basic access to metrics: \\
     	\hspace*{0.5cm}\# pmstat -t 1 \\
-		\hspace*{0.5cm}\# pmrep -a \textless archivename\textgreater   \textless metric\textgreater \\
+		\hspace*{0.5cm}\# pmstat -a \textless archivename\textgreater \textless metric\textgreater \\
+		\hspace*{0.5cm}\# pmrep -a \textless archivename\textgreater \textless metric\textgreater \\
     	\hspace*{0.5cm}\# pcp -a 20180831.11.31 -\/-origin @1pm \textbackslash \\
     	\hspace*{1.0cm}   dstat -\/-time -\/-disk -\/-mem 60sec 10 \\
     	\hspace*{0.5cm}\# pmrep -a 20220128 kernel.cpu -p -t 300 \textbackslash \\
     	\hspace*{1.0cm}   -\/-hostzone -S @19:30 \\
-		\\
+
+		Show I/O stats for sda, starting at Jul 19th \\
+    	\hspace*{0.5cm}\# pmiostat -z -a \textless archive\textgreater -x t \\
+    	\hspace*{1.0cm}   -t 10m -S'@Jul 19 19:55:00' -s 10 -P0 -R 'sda\$' \\
+
 		\textbf{Graphical access} \\
     	\hspace*{0.5cm}\# pmchart \\
     	\hspace*{0.5cm}\# dnf -y install pcp2pdf; \textbackslash \\
@@ -149,7 +228,7 @@
 		\textbf{PMDA installation} \\
 		PMDA's are code pieces capable of reading metrics from their area
 		like sensors, database, and so on.
-		PMDS's can be searched as packages and installed, for example on yum4/dnf
+		PMDA's can be searched as packages and installed, for example on yum4/dnf
 		distros: \\ 
     	\hspace*{0.5cm}\# dnf search pcp-pmda \\
     	\hspace*{0.5cm}\# dnf install -y pcp-pmda-lmsensors \\
@@ -195,56 +274,6 @@
     	\hspace*{0.5cm}\# pmrep proc.smaps.rss -g -i '.*75.*'
 }
 
-%----------------------------------------------------------------------------------
-% Remote collection
-%----------------------------------------------------------------------------------
-
-\posterbox[adjusted title=Remote collection]
-	{name=remotecollection,column=4,below=top}{
-		\textbf{Install PCP on clients} \\
-		Setup client systems to offer metrics via pmcd: install pcp, open packet 
-		based firewall, enable remote access in pmcd: \\
-	\footnotesize{
-	    \hspace*{0.5cm}\# yum -y install pcp \\
-	    \hspace*{0.5cm}\# firewall-cmd -\/-permanent -\/-zone=public \textbackslash \\
-	    \hspace*{1.1cm}   -\/-add-port=44321/tcp \\
-	    \hspace*{0.5cm}\# firewall-cmd -\/-reload \\
-	    \hspace*{0.5cm}\# CONFIG=/etc/sysconfig/pmcd \\
-	    \hspace*{0.5cm}\# if grep -q PMCD\_LOCAL \$CONFIG; then \textbackslash \\
-	    \hspace*{1.1cm}   sed -ie 's,PMCD\_LOCAL.*,PMCD\_LOCAL=0,' \textbackslash \\
-	    \hspace*{1.1cm}   /etc/sysconfig/pmcd \textbackslash \\
-	    \hspace*{0.9cm}   else \\
-	    \hspace*{1.1cm}   echo 'PMCD\_LOCAL=0' >>/etc/sysconfig/pmcd \\
-	    \hspace*{0.9cm}   fi \\
-	    \hspace*{0.5cm}\# grep PMCD\_LOCAL /etc/sysconfig/pmcd \\
-	    \hspace*{0.5cm}\# service pmcd restart \\
-	    \hspace*{0.5cm}\# chkconfig pmcd on \\
-	}
-
-		\textbf{Install PCP on collector system} \\
-	On the collector, we install pcp-zeroconf which also sets up logging to archive files.
-	We then set variable CLIENT to the clients name, create a config- and controlfile,
-	and notify pmlogger of the changes.
-	\footnotesize{
-	    \hspace*{0.5cm}\# yum -y install pcp-zeroconf \\
-	    \hspace*{0.5cm}\# CLIENT=rhel7u8a \\
-	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogconf \textbackslash \\
-	    \hspace*{1.1cm}   /var/lib/pcp/config/pmlogger/config.\$CLIENT \\
-	    \hspace*{0.5cm}\# echo "\$CLIENT.local n n " \textbackslash \\
-	    \hspace*{1.1cm}   PCP\_LOG\_DIR/pmlogger/\$CLIENT.local" \textbackslash \\
-	    \hspace*{1.1cm}   " -r -T30d -c config.\$CLIENT" \textbackslash \\
-	    \hspace*{1.1cm}   \textgreater/etc/pcp/pmlogger/control.d/\$CLIENT \\
-	    \hspace*{0.5cm}\# /usr/libexec/pcp/bin/pmlogger\_check
-	}
-
-% \includegraphics[width=10em,height=4em]{pics/s05_pcp-daemons-grafanaserver.png}
-\center{
-    \includegraphics[width=20em]{pics/s05_browsers_pcp_servers_overview_componentsb.png}
-}
-
-% pmlogconf - configures configfile, including the pmdas you run on the system
-
-}
 
 \end{tcbposter}
 \end{document}
